@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors');
 const ObjectId = require('mongodb').ObjectID
 const MongoClient = require('mongodb').MongoClient;
-// require('dotenv/config');
 require('dotenv').config()
 
 const app = express()
@@ -108,6 +107,29 @@ client.connect(err => {
                 console.log(result);
             })
     })
+
+    app.post('/isAdmin', (req, res) => {
+        const email = req.body.email;
+        adminCollection.find({ email: email })
+            .toArray((err, doctors) => {
+                res.send(doctors.length > 0);
+            })
+    })
+
+    app.patch("/updateStatus/:id", (req, res) => {
+        console.log(req.body.optionValue);
+        orderCollection
+            .updateOne(
+                { _id: ObjectId(req.params.id) },
+                {
+                    $set: { process: req.body.optionValue },
+                }
+            )
+            .then((result) => {
+                console.log(result.modifiedCount > 0);
+                res.send(result.modifiedCount > 0);
+            });
+    });
 
 });
 
